@@ -164,7 +164,7 @@ class AIPlayer(Player):
             )
         return diag_bonus
 
-    def xplore_lines_smart(self, board, valeur=[0, 1, 5, 18, 200]):
+    def xplore_lines_smart(self, board, valeur=[0, 1, 5, 18, 1000]):
         bonus_lines = 0
         for i in range(6):
             line = list(filter(lambda x: x != 0, board.getRow(i)))
