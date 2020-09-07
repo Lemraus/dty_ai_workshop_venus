@@ -59,3 +59,6 @@ class AIPlayer(Player):
                 S += score_board[i][j] * board[i][j]
         # alignements
         return S
+
+    def cou():
+        pass
