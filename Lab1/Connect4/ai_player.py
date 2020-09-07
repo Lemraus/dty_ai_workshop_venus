@@ -6,7 +6,7 @@ class AIPlayer(Player):
     beta search to """
 	
     def __init__(self):
-        self.name = "Mettez ici le nom de votre IA"
+        self.name = "Venus"
 
     
     def getColumn(self, board):
