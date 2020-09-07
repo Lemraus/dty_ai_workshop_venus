@@ -10,7 +10,7 @@ class AIPlayer(Player):
 
     def __init__(self):
         self.name = "Venus"
-        self.max_depth = 2
+        self.max_depth = 3
 
     def getColumn(self, board):
         timestamp_start = time.time()
@@ -59,7 +59,7 @@ class AIPlayer(Player):
             if depth == self.max_depth:
                 beta_candidate = self.score(next_board)
             else:
-                beta_candidate = self.min_step(
+                beta_candidate = self.max_step(
                     next_board, depth + 1, min(beta, min_beta), max_alpha
                 )
             if beta_candidate < max_alpha:
