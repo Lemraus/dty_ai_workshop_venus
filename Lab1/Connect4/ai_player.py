@@ -1,6 +1,8 @@
 from player import Player
 from copy import deepcopy
 import time
+import traceback
+
 
 class AIPlayer(Player):
     """This player should implement a heuristic along with a min-max and alpha
@@ -8,41 +10,65 @@ class AIPlayer(Player):
 
     def __init__(self):
         self.name = "Venus"
+        self.max_depth = 2
 
     def getColumn(self, board):
         timestamp_start = time.time()
 
-        alpha = -1e6
-        best_ai_i_score = [None, -1e6]
+        best_score = -1e6
+        best_col = None
 
-        for i in board.getPossibleColumns():  # i is the position of our pin
-            board_turn1 = deepcopy(board)
-            board_turn1.play(1, i)
-            min_score = 1e6
-
-            for j in board_turn1.getPossibleColumns():
-                board_turn2 = deepcopy(board_turn1)
-                board_turn2.play(-1, j)
-                score = AIPlayer.score(board_turn2)
-                if score < min_score:
-                    min_score = score
-                if score < alpha:
-                    break
-
-            if min_score > best_ai_i_score[1]:
-                best_ai_i_score = [i, min_score]
+        for col in board.getPossibleColumns():
+            next_board = deepcopy(board)
+            next_board.play(self.color, col)
+            try:
+                score = self.max_step(next_board, 0, 1e6, -1e6)
+            except:
+                traceback.print_exc()
+            if score > best_score:
+                best_score = score
+                best_col = col
 
         print(
-            "Temps pris pour effectuer les calculs : ",
-            time.time() - timestamp_start,
+            "Temps pris pour effectuer les calculs : ", time.time() - timestamp_start,
         )
-        return best_ai_i_score[0]
-    
-    def ai_step(self, board, depth):
-        pass
+        return best_col
 
-    @staticmethod
-    def score(board):
+    def max_step(self, board, depth, min_beta, max_alpha):
+        alpha = -1e6
+        for col in board.getPossibleColumns():
+            next_board = deepcopy(board)
+            next_board.play(-self.color, col)
+            if depth == self.max_depth:
+                alpha_candidate = self.score(next_board)
+            else:
+                alpha_candidate = self.min_step(
+                    next_board, depth + 1, min_beta, max(alpha, max_alpha)
+                )
+            if alpha_candidate > min_beta:
+                return alpha_candidate
+            if alpha_candidate > alpha:
+                alpha = alpha_candidate
+        return alpha
+
+    def min_step(self, board, depth, min_beta, max_alpha):
+        beta = 1e6
+        for col in board.getPossibleColumns():
+            next_board = deepcopy(board)
+            next_board.play(self.color, col)
+            if depth == self.max_depth:
+                beta_candidate = self.score(next_board)
+            else:
+                beta_candidate = self.min_step(
+                    next_board, depth + 1, min(beta, min_beta), max_alpha
+                )
+            if beta_candidate < max_alpha:
+                return beta_candidate
+            if beta_candidate < beta:
+                beta = beta_candidate
+        return beta
+
+    def score(self, board):
         # base
         score_board = [
             [3, 4, 5, 7, 5, 4, 3],
@@ -53,18 +79,31 @@ class AIPlayer(Player):
             [3, 4, 5, 7, 5, 4, 3],
         ]
         S = 0
+
         for i in range(6):
             for j in range(7):
-                S += score_board[i][j] * board[i][j]
+                S += score_board[i][j] * board.getRow(i)[j]
         # alignements
+        S += self.xplore_columns_smart(board)
         return S
 
-    @staticmethod
-    def explore_lignes(board):
-        for j in range(6):
-            if board[]
-            allie_streak = 0
-            adv_streak = 0
-            for i in range(1, 7):
-                pass
+    def xplore_columns_smart(self, board, valeur=[0, 1, 5, 18, 200, 0]):
+        bonus_columns = 0
 
+        for j in board.getPossibleColumns():
+
+            # getting column without zeros
+            col = board.getCol(j)
+            while col and col[-1] == 0:
+                col.pop()
+
+            if col:  # Continue si la colonne est non vide
+                top_pin = col.pop()
+                streak = 1
+
+                while col and top_pin == col.pop():
+                    streak += 1
+                # on ajoute la valeur
+                bonus_columns += self.color * top_pin * valeur[streak]
+
+        return bonus_columns
