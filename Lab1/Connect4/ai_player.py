@@ -15,18 +15,18 @@ class AIPlayer(Player):
     def getColumn(self, board):
         timestamp_start = time.time()
 
-        best_score = -1e6
+        alpha = -1e6
         best_col = None
 
         for col in board.getPossibleColumns():
             next_board = deepcopy(board)
             next_board.play(self.color, col)
             try:
-                score = self.max_step(next_board, 0, 1e6, -1e6)
+                beta = self.max_step(next_board, 0, 1e6, alpha)
             except:
                 traceback.print_exc()
-            if score > best_score:
-                best_score = score
+            if beta > alpha:
+                alpha = beta
                 best_col = col
 
         print(
@@ -85,6 +85,7 @@ class AIPlayer(Player):
                 S += score_board[i][j] * board.getRow(i)[j]
         # alignements
         S += self.xplore_columns_smart(board)
+
         return S
 
     def xplore_columns_smart(self, board, valeur=[0, 1, 5, 18, 200, 0]):
