@@ -13,7 +13,7 @@ class AIPlayer(Player):
     def __init__(self):
         self.name = "Venus"
         self.max_depth = 2
-        self.valeurs = [0, 1, 15, 50, 1000, 1e5]
+        self.valeurs = [0, 1, 5, 40, 1000, 1e5]
 
     def getColumn(self, board):
         timestamp_start = time.time()
@@ -34,9 +34,6 @@ class AIPlayer(Player):
                 alpha = beta
                 best_col = col
 
-        print(
-            "Temps pris pour effectuer les calculs : ", time.time() - timestamp_start,
-        )
         return best_col
 
     def max_step(self, board, depth, min_beta, max_alpha):
@@ -91,6 +88,9 @@ class AIPlayer(Player):
             [0, 0, 0, 0, 0, 0, 0],
         ]
         S = 0
+        # print(
+        #     "Temps pris pour effectuer les calculs : ", time.time() - timestamp_start,
+        # )
 
         for i in range(6):
             for j in range(7):
@@ -121,10 +121,9 @@ class AIPlayer(Player):
                 # on ajoute la valeur
                 bonus_columns += top_pin * self.valeurs[streak]
 
-        return self.color * bonus_columns
+        return bonus_columns
 
     def xplore_Diag_up(self, board):
-
         diag_bonus = 0
         for i in range(-5, 7):
             liste = board.getDiagonal(True, i)
@@ -147,7 +146,6 @@ class AIPlayer(Player):
         return diag_bonus + diag_down_bonus
 
     def xplore_Diag_down(self, board, sum_bonus):
-
         diag_bonus = 0
         for i in range(0, 12):
             liste = board.getDiagonal(False, i)
@@ -171,7 +169,7 @@ class AIPlayer(Player):
         for i in range(6):
             line = list(filter(lambda x: x != 0, board.getRow(i)))
             if line:
-                for streak in range(2, 5):                    # print(streak)
+                for streak in range(2, 5):  # print(streak)
                     for j in range(7 - streak):
                         k = sum(line[j : j + streak])
                         # print("   ", k)
@@ -179,4 +177,4 @@ class AIPlayer(Player):
                             bonus_lines += self.valeurs[streak]
                         elif k <= -(streak):
                             bonus_lines -= self.valeurs[streak]
-        return self.color * bonus_lines
+        return bonus_lines
