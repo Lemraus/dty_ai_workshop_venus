@@ -98,6 +98,7 @@ class AIPlayer(Player):
         # alignements
         S += self.xplore_Diag_up(board)
         S += self.xplore_columns_smart(board)
+        S += self.xplore_lines_smart(board)
 
         return S
 
@@ -107,7 +108,7 @@ class AIPlayer(Player):
         for j in board.getPossibleColumns():
 
             # getting column without zeros
-            col = board.getCol(j)
+            col = deepcopy(board.getCol(j))
             while col and col[-1] == 0:
                 col.pop()
 
@@ -148,7 +149,7 @@ class AIPlayer(Player):
     def xplore_Diag_down(self, board, sum_bonus):
 
         diag_bonus = 0
-        for i in range(-5, 7):
+        for i in range(0, 12):
             liste = board.getDiagonal(False, i)
             allie_streak = 0
             adv_streak = 0
@@ -169,13 +170,13 @@ class AIPlayer(Player):
         bonus_lines = 0
         for i in range(6):
             line = list(filter(lambda x: x != 0, board.getRow(i)))
-            for streak in range(2, 5):
-                # print(streak)
-                for j in range(7 - streak):
-                    k = sum(line[j : j + streak])
-                    # print("   ", k)
-                    if k >= streak:
-                        bonus_lines += self.valeurs[streak]
-                    elif k <= -(streak):
-                        bonus_lines -= self.valeurs[streak]
+            if line:
+                for streak in range(2, 5):                    # print(streak)
+                    for j in range(7 - streak):
+                        k = sum(line[j : j + streak])
+                        # print("   ", k)
+                        if k >= streak:
+                            bonus_lines += self.valeurs[streak]
+                        elif k <= -(streak):
+                            bonus_lines -= self.valeurs[streak]
         return self.color * bonus_lines
