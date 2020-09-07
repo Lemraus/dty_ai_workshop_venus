@@ -5,10 +5,10 @@ from ai_player import AIPlayer
 from ui_game import UIGame
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--p1', default='player 1')
-    parser.add_argument('--p2', default='player 2')
+    parser.add_argument("--p1", default="player 1")
+    parser.add_argument("--p2", default="player 2")
     args = parser.parse_args()
 
     player1 = AIPlayer()
