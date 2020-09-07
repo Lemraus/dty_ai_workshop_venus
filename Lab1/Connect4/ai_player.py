@@ -10,7 +10,7 @@ class AIPlayer(Player):
 
     def __init__(self):
         self.name = "Venus"
-        self.max_depth = 3
+        self.max_depth = 2
 
     def getColumn(self, board):
         timestamp_start = time.time()
@@ -21,6 +21,8 @@ class AIPlayer(Player):
         for col in board.getPossibleColumns():
             next_board = deepcopy(board)
             next_board.play(self.color, col)
+            if self.score(deepcopy(next_board)) > 500:
+                return col
             try:
                 beta = self.max_step(next_board, 0, 1e6, alpha)
             except:
@@ -39,8 +41,11 @@ class AIPlayer(Player):
         for col in board.getPossibleColumns():
             next_board = deepcopy(board)
             next_board.play(-self.color, col)
+            next_board_score = self.score(deepcopy(next_board))
+            if next_board_score > 500:
+                return next_board_score
             if depth == self.max_depth:
-                alpha_candidate = self.score(next_board)
+                alpha_candidate = next_board_score
             else:
                 alpha_candidate = self.min_step(
                     next_board, depth + 1, min_beta, max(alpha, max_alpha)
@@ -56,12 +61,16 @@ class AIPlayer(Player):
         for col in board.getPossibleColumns():
             next_board = deepcopy(board)
             next_board.play(self.color, col)
+            next_board_score = self.score(deepcopy(next_board))
+            if next_board_score < -500:
+                return next_board_score
             if depth == self.max_depth:
-                beta_candidate = self.score(next_board)
+                beta_candidate = next_board_score
             else:
                 beta_candidate = self.max_step(
                     next_board, depth + 1, min(beta, min_beta), max_alpha
                 )
+
             if beta_candidate < max_alpha:
                 return beta_candidate
             if beta_candidate < beta:
@@ -88,7 +97,7 @@ class AIPlayer(Player):
 
         return S
 
-    def xplore_columns_smart(self, board, valeur=[0, 1, 5, 18, 200, 0]):
+    def xplore_columns_smart(self, board, valeur=[0, 1, 5, 18, 1000, 0]):
         bonus_columns = 0
 
         for j in board.getPossibleColumns():
