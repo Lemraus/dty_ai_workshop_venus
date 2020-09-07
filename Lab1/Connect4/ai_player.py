@@ -13,6 +13,7 @@ class AIPlayer(Player):
     def __init__(self):
         self.name = "Venus"
         self.max_depth = 2
+        self.valeurs = [0, 1, 15, 50, 1000, 1e5]
 
     def getColumn(self, board):
         timestamp_start = time.time()
@@ -100,7 +101,7 @@ class AIPlayer(Player):
 
         return S
 
-    def xplore_columns_smart(self, board, valeur=[0, 1, 5, 18, 1000, 0]):
+    def xplore_columns_smart(self, board):
         bonus_columns = 0
 
         for j in board.getPossibleColumns():
@@ -117,11 +118,11 @@ class AIPlayer(Player):
                 while col and top_pin == col.pop():
                     streak += 1
                 # on ajoute la valeur
-                bonus_columns += top_pin * valeur[streak]
+                bonus_columns += top_pin * self.valeurs[streak]
 
         return self.color * bonus_columns
 
-    def xplore_Diag_up(self, board, bonus=[0, 1, 5, 18, 1000]):
+    def xplore_Diag_up(self, board):
 
         diag_bonus = 0
         for i in range(-5, 7):
@@ -136,15 +137,15 @@ class AIPlayer(Player):
                 if j == -self.color:
                     adv_streak += 1
                     allie_streak = 0
-            diag_bonus += (allie_streak * bonus[allie_streak]) - (
-                adv_streak * bonus[adv_streak]
+            diag_bonus += (allie_streak * self.valeurs[allie_streak]) - (
+                adv_streak * self.valeurs[adv_streak]
             )
             allie_streak = 0
             adv_streak = 0
         diag_down_bonus = self.xplore_Diag_down(board, sum_bonus=diag_bonus)
         return diag_bonus + diag_down_bonus
 
-    def xplore_Diag_down(self, board, sum_bonus, bonus=[0, 1, 5, 18, 1000]):
+    def xplore_Diag_down(self, board, sum_bonus):
 
         diag_bonus = 0
         for i in range(-5, 7):
@@ -159,12 +160,12 @@ class AIPlayer(Player):
                     adv_streak += 1
                     allie_streak = 0
 
-            diag_bonus += (allie_streak * bonus[allie_streak]) - (
-                adv_streak * bonus[adv_streak]
+            diag_bonus += (allie_streak * self.valeurs[allie_streak]) - (
+                adv_streak * self.valeurs[adv_streak]
             )
         return diag_bonus
 
-    def xplore_lines_smart(self, board, valeur=[0, 1, 5, 18, 1000]):
+    def xplore_lines_smart(self, board):
         bonus_lines = 0
         for i in range(6):
             line = list(filter(lambda x: x != 0, board.getRow(i)))
@@ -174,7 +175,7 @@ class AIPlayer(Player):
                     k = sum(line[j : j + streak])
                     # print("   ", k)
                     if k >= streak:
-                        bonus_lines += valeur[streak]
+                        bonus_lines += self.valeurs[streak]
                     elif k <= -(streak):
-                        bonus_lines -= valeur[streak]
+                        bonus_lines -= self.valeurs[streak]
         return self.color * bonus_lines
