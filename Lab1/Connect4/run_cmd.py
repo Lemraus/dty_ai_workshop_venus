@@ -15,9 +15,9 @@ if __name__ == "__main__":
     parser.add_argument("--num", default="4", type=int)
     args = parser.parse_args()
 
-    player1 = AIPlayer()
+    player1 = RandomPlayer()
     player1.name = args.p1
-    player2 = VenusAI()
+    player2 = AIPlayer()
     player2.name = args.p2
     game = Game(player1, player2, args.cols, args.rows, args.num, verbose=True)
     game.run()

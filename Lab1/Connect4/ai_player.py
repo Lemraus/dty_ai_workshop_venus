@@ -6,7 +6,7 @@ class AIPlayer(Player):
     def __init__(self):
         self.name = "Lemraus"
         self.max_depth = 3
-        self.streak_weights = [0, 1, 15, 100, 2000]
+        self.streak_weights = [0, 1, 50, 200, 2000]
 
     def getColumn(self, board):
         alpha = -1e6
@@ -74,46 +74,32 @@ class AIPlayer(Player):
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
         ]
-        row_score = self.get_row_score(row, col, board)
-        col_score = self.get_col_score(row, col, board)
-        diag_score = self.get_diag_score(row, col, board)
-        score = weights[row][col] + row_score + col_score + diag_score
-        return score
+
+        row_slice = board.getRow(row)[max(0, col - 3) : min(6, col + 4)]
+        row_score = self.get_streaks_score(row_slice)
+        col_slice = board.getCol(col)[max(0, row - 3) : min(5, row + 4)]
+        col_score = self.get_streaks_score(col_slice)
+        diag_up = board.getDiagonal(True, col - row)
+        diag_down = board.getDiagonal(False, col + row)
+        diag_score = self.get_streaks_score(diag_up) + self.get_streaks_score(diag_down)
+
+        score = row_score + col_score + diag_score
+        return weights[row][col] + score
 
     def get_streaks_score(self, l):
         streak = 0
+        streak_score = 0
         score = 0
         prev_val = 0
         for val in l:
-            if val == 0:
-                prev_val = 0
-                streak = 0
-                continue
             if val != prev_val:
                 streak = 0
+                score += streak_score
+                streak_score = 0
+                prev_val = val
+            if val == 0:
+                continue
             streak += 1
-            score += self.color * val * self.streak_weights[min(4, streak)]
-            prev_val = val
+            streak_score = self.color * val * self.streak_weights[min(4, streak)]
+        score += streak_score
         return score
-
-    def get_row_score(self, row, col, board):
-        row_slice = board.getRow(row)[max(0, col - 3) : min(6, col + 4)]
-        return self.get_streaks_score(row_slice)
-
-    def get_col_score(self, row, col, board):
-        col_slice = board.getCol(col)[max(0, row - 3) : min(5, row + 4)]
-        return self.get_streaks_score(col_slice)
-
-    def get_diag_score(self, row, col, board):
-        diag_up_score = self.get_diag_up_score(row, col, board)
-        diag_down_score = self.get_diag_down_score(row, col, board)
-        return diag_up_score + diag_down_score
-
-    def get_diag_up_score(self, row, col, board):
-        diag_up = board.getDiagonal(True, col - row)
-        return self.get_streaks_score(diag_up)
-
-    def get_diag_down_score(self, row, col, board):
-        diag_down = board.getDiagonal(False, col + row)
-        return self.get_streaks_score(diag_down)
-

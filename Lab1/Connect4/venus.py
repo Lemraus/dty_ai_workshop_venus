@@ -1,8 +1,5 @@
 from player import Player
 from copy import deepcopy
-import time
-import traceback
-import random
 
 
 class AIPlayer(Player):
@@ -15,8 +12,6 @@ class AIPlayer(Player):
         self.valeurs = [0, 1, 5, 40, 1000, 1e5]
 
     def getColumn(self, board):
-        timestamp_start = time.time()
-
         alpha = -1e6
         best_col = None
 
@@ -25,10 +20,7 @@ class AIPlayer(Player):
             next_board.play(self.color, col)
             if self.score(deepcopy(next_board)) > 500:
                 return col
-            try:
-                beta = self.max_step(next_board, 0, 1e6, alpha)
-            except:
-                traceback.print_exc()
+            beta = self.max_step(next_board, 0, 1e6, alpha)
             if beta > alpha:
                 alpha = beta
                 best_col = col
@@ -87,9 +79,6 @@ class AIPlayer(Player):
             [0, 0, 0, 0, 0, 0, 0],
         ]
         S = 0
-        # print(
-        #     "Temps pris pour effectuer les calculs : ", time.time() - timestamp_start,
-        # )
 
         for i in range(6):
             for j in range(7):
