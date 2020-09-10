@@ -11,13 +11,19 @@ from keras.optimizers import Adam
 
 class DQLAgent(object):
     def __init__(
-            self, state_size=-1, action_size=-1,
-            max_steps=200, gamma=1.0, epsilon=1.0, learning_rate=0.1):
+        self,
+        state_size=-1,
+        action_size=-1,
+        max_steps=200,
+        gamma=1.0,
+        epsilon=1.0,
+        learning_rate=0.1,
+    ):
         self.state_size = state_size
         self.action_size = action_size
         self.max_steps = max_steps
         self.memory = deque(maxlen=2000)
-        self.gamma = gamma   # discount rate
+        self.gamma = gamma  # discount rate
         self.epsilon = epsilon  # exploration rate
         self.learning_rate = learning_rate  # learning_rate
         if self.state_size > 0 and self.action_size > 0:
@@ -31,7 +37,7 @@ class DQLAgent(object):
 
         # TODO(students): !!!!!!!!! IMPLEMENT THIS !!!!!!!!!!!!!!  """
 
-        model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
+        model.compile(loss="mse", optimizer=Adam(lr=self.learning_rate))
         return model
 
     def updateEpsilon(self):
@@ -51,7 +57,7 @@ class DQLAgent(object):
             self.action_size = self.model.layers[-1].output.shape[1]
             return True
         else:
-            logging.error('no such file {}'.format(filename))
+            logging.error("no such file {}".format(filename))
             return False
 
     def remember(self, state, action, reward, next_state, done):
@@ -68,8 +74,9 @@ class DQLAgent(object):
         for state, action, reward, next_state, done in minibatch:
             target = reward
             if not done:
-                target = (reward + self.gamma *
-                          np.amax(self.model.predict(next_state)[0]))
+                target = reward + self.gamma * np.amax(
+                    self.model.predict(next_state)[0]
+                )
             target_f = self.model.predict(state)
             target_f[0][action] = target
             self.model.fit(state, target_f, epochs=1, verbose=0)
@@ -79,13 +86,14 @@ class DQLAgent(object):
     def setTitle(self, env, train, name, num_steps, returns):
         h = name
         if train:
-            h = 'Iter {} ($\epsilon$={:.2f})'.format(self.count, self.epsilon)
-        end = '\nreturn {:.2f}'.format(returns) if train else ''
+            h = "Iter {} ($\epsilon$={:.2f})".format(self.count, self.epsilon)
+        end = "\nreturn {:.2f}".format(returns) if train else ""
 
-        env.mayAddTitle('{}\nsteps: {} | {}{}'.format(
-            h, num_steps, env.circuit.debug(), end))
+        env.mayAddTitle(
+            "{}\nsteps: {} | {}{}".format(h, num_steps, env.circuit.debug(), end)
+        )
 
-    def run_once(self, env, train=True, greedy=False, name=''):
+    def run_once(self, env, train=True, greedy=False, name=""):
         self.count += 1
         state = env.reset()
         state = np.reshape(state, [1, self.state_size])
@@ -109,12 +117,14 @@ class DQLAgent(object):
 
         return returns, num_steps
 
-    def train(
-            self, env, episodes, minibatch, output='weights.h5', render=False):
+    def train(self, env, episodes, minibatch, output="weights.h5", render=False):
         for e in range(episodes):
             r, _ = self.run_once(env, train=True, greedy=False)
-            print("episode: {}/{}, return: {}, e: {:.2}".format(
-                e, episodes, r, self.epsilon))
+            print(
+                "episode: {}/{}, return: {}, e: {:.2}".format(
+                    e, episodes, r, self.epsilon
+                )
+            )
 
             if len(self.memory) > minibatch:
                 self.replay(minibatch)

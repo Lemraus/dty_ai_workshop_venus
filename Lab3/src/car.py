@@ -18,7 +18,7 @@ class Car(object):
         self.patch = None
         self.sensor_lines = None
         self.num_sensors = num_sensors
-        self.color = '#44dafb'
+        self.color = "#44dafb"
 
     def reset(self):
         self.x = self.circuit.start.x
@@ -68,7 +68,8 @@ class Car(object):
         # Builds the half line
         origin = self.getCoords(1, 0)
         line = geom.LineString(
-            [origin, self.getCoords(1000 * np.cos(phi), 1000 * np.sin(phi))])
+            [origin, self.getCoords(1000 * np.cos(phi), 1000 * np.sin(phi))]
+        )
 
         # Compute intersection with circuit that lies inside the circuit
         origin = geom.Point(origin)
@@ -104,8 +105,7 @@ class Car(object):
 
     def update_plot(self, ax):
         # Plot the car
-        other = PolygonPatch(
-            self.car, fc=self.color, ec='black', alpha=1.0, zorder=4)
+        other = PolygonPatch(self.car, fc=self.color, ec="black", alpha=1.0, zorder=4)
         if self.patch is None:
             self.patch = other
         else:
@@ -117,15 +117,14 @@ class Car(object):
         origin = self.getCoords(1, 0)
         for phi in self.angles():
             p = self.intersection(phi)
-            sensor_lines.append((
-                [origin[0], p.xy[0][0]], [origin[1], p.xy[1][0]]))
+            sensor_lines.append(([origin[0], p.xy[0][0]], [origin[1], p.xy[1][0]]))
 
         if self.sensor_lines is None:
             self.sensor_lines = []
             for curr_x, curr_y in sensor_lines:
                 line = ax.plot(
-                    curr_x, curr_y, color='#df5a65', linestyle=':', lw=2,
-                    zorder=5)
+                    curr_x, curr_y, color="#df5a65", linestyle=":", lw=2, zorder=5
+                )
                 self.sensor_lines.append(line[0])
         else:
             for k, (curr_x, curr_y) in enumerate(sensor_lines):

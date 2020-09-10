@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 
 
 class Interface(object):
-    SPEED = {'up': 1, 'down': -1}
-    ANGLE = {'left': 1, 'right': -1}
+    SPEED = {"up": 1, "down": -1}
+    ANGLE = {"left": 1, "right": -1}
 
     def __init__(self, circuit, car):
         self.circuit = circuit
@@ -14,7 +14,7 @@ class Interface(object):
 
         self.circuit.plot(self.ax)
         self.car.plot(self.ax)
-        self.fig.canvas.mpl_connect('key_press_event', self.onpress)
+        self.fig.canvas.mpl_connect("key_press_event", self.onpress)
 
     def show(self, block=True):
         plt.ion()

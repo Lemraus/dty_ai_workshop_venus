@@ -3,7 +3,6 @@ from descartes import PolygonPatch
 
 
 class Circuit(object):
-
     def __init__(self, points, width, num_checkpoints=100):
         self.points = points
         if self.points[0] != self.points[-1]:
@@ -33,23 +32,29 @@ class Circuit(object):
             curr = geom.Point((x, y))
             if curr.distance(last) > maxDistance and curr.y == last.y:
                 maxDistance = curr.distance(last)
-                self.start = geom.Point(
-                    (0.5 * (x + last.x)), 0.5 * (y + last.y))
+                self.start = geom.Point((0.5 * (x + last.x)), 0.5 * (y + last.y))
             last = curr
 
-        self.start_line = geom.LineString([
-            (self.start.x, self.start.y - self.width),
-            (self.start.x, self.start.y + self.width)])
+        self.start_line = geom.LineString(
+            [
+                (self.start.x, self.start.y - self.width),
+                (self.start.x, self.start.y + self.width),
+            ]
+        )
 
     def makeCheckpoints(self, n):
         step_ext = self.circuit.exterior.length / n
         step_int = self.circuit.interiors[0].length / n
         self.checklines = []
         for i in range(n):
-            self.checklines.append(geom.LineString([
-                self.circuit.exterior.interpolate(step_ext * (n - i)),
-                self.circuit.interiors[0].interpolate(step_int * i)],
-            ))
+            self.checklines.append(
+                geom.LineString(
+                    [
+                        self.circuit.exterior.interpolate(step_ext * (n - i)),
+                        self.circuit.interiors[0].interpolate(step_int * i),
+                    ],
+                )
+            )
         self.reset()
 
     def reset(self):
@@ -77,19 +82,28 @@ class Circuit(object):
     def __contains__(self, shape):
         return self.dilated.contains(shape)
 
-    def plot(self, ax, color='gray', skeleton=True):
+    def plot(self, ax, color="gray", skeleton=True):
         if skeleton:
             ax.plot(
-                self.line.xy[0], self.line.xy[1],
-                color='white', linewidth=3, solid_capstyle='round', zorder=3,
-                linestyle='--')
+                self.line.xy[0],
+                self.line.xy[1],
+                color="white",
+                linewidth=3,
+                solid_capstyle="round",
+                zorder=3,
+                linestyle="--",
+            )
 
         ax.plot(
-            self.start_line.xy[0], self.start_line.xy[1],
-            color='black', linewidth=3, linestyle='-', zorder=3)
+            self.start_line.xy[0],
+            self.start_line.xy[1],
+            color="black",
+            linewidth=3,
+            linestyle="-",
+            zorder=3,
+        )
 
-        patch = PolygonPatch(
-            self.circuit, fc=color, ec='black', alpha=0.5, zorder=2)
+        patch = PolygonPatch(self.circuit, fc=color, ec="black", alpha=0.5, zorder=2)
         ax.add_patch(patch)
 
         bounds = self.circuit.bounds
