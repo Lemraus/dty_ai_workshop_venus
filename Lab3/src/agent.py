@@ -6,6 +6,7 @@ import numpy as np
 
 from collections import deque
 from keras.models import Sequential
+from keras.layers import Dense
 from keras.optimizers import Adam
 
 
@@ -26,6 +27,7 @@ class DQLAgent(object):
         self.gamma = gamma  # discount rate
         self.epsilon = epsilon  # exploration rate
         self.learning_rate = learning_rate  # learning_rate
+        print(self.learning_rate)
         if self.state_size > 0 and self.action_size > 0:
             self.model = self.build_model()
 
@@ -35,7 +37,11 @@ class DQLAgent(object):
         """Neural Net for Deep-Q learning Model."""
         model = Sequential()
 
-        # TODO(students): !!!!!!!!! IMPLEMENT THIS !!!!!!!!!!!!!!  """
+        model.add(Dense(6, activation="relu"))
+        model.add(Dense(12))
+        model.add(Dense(20))
+        model.add(Dense(20))
+        model.add(Dense(15))
 
         model.compile(loss="mse", optimizer=Adam(lr=self.learning_rate))
         return model
@@ -43,9 +49,7 @@ class DQLAgent(object):
     def updateEpsilon(self):
         """This function change the value of self.epsilon to deal with the
         exploration-exploitation tradeoff as time goes"""
-
-        # TODO(students): !!!!!!!!! IMPLEMENT THIS !!!!!!!!!!!!!!  """
-        # It should change (or not) the value of self.epsilon
+        self.epsilon = max(0.2, self.epsilon - 1e-3)
 
     def save(self, output: str):
         self.model.save(output)
@@ -64,10 +68,12 @@ class DQLAgent(object):
         self.memory.append((state, action, reward, next_state, done))
 
     def act(self, state, greedy=True):
-        # !!!!  TODO(students): implements an epsilon greedy policy here   !!!!
-        # Make sure that if greedy is True, the policy should be greedy
-        # As it is the policy is just plain greedy....
-        return np.argmax(self.model.predict(state))
+        if greedy:
+            return np.argmax(self.model.predict(state))
+        return np.argmax(
+            (1 - self.epsilon) * self.model.predict(state)
+            + self.epsilon * np.array([np.random.sample((self.action_size,))])
+        )
 
     def replay(self, batch_size):
         minibatch = random.sample(self.memory, batch_size)

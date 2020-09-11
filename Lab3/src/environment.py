@@ -25,21 +25,25 @@ class Environment(object):
 
     def reward(self) -> float:
         """Computes the reward at the present moment"""
-
-        # TODO(students): !!!!!!!!! IMPLEMENT THIS !!!!!!!!!!!!!!  """
-        # This should return a float"""
-        return 0.0
+        if not self.car.in_circuit():
+            return -100 * (1 - (self.circuit.laps + self.circuit.progression))
+        if self.car.speed == 0:
+            return -100
+        r = (
+            10
+            * 100
+            * (self.circuit.laps + self.circuit.progression - self.prev_progress)
+        )
+        self.prev_progress = self.circuit.laps + self.circuit.progression
+        return r
 
     def isEnd(self) -> bool:
         """Is the episode over ?"""
-
-        # TODO(students): !!!!!!!!! IMPLEMENT THIS !!!!!!!!!!!!!!  """
-        # Should return true if we have reached the end of an episode, False
-        # otherwise
-        return False
+        return (self.count > 0 and self.car.speed == 0) or not self.car.in_circuit()
 
     def reset(self):
         self.count = 0
+        self.prev_progress = 0
         self.car.reset()
         self.circuit.reset()
         return self.current_state

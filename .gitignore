@@ -1,3 +1,5 @@
 __pycache__
 .idea
 .vscode
+Lab3/req-gpu.txt
+Lab3/*.h5
